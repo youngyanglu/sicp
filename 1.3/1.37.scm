@@ -15,6 +15,6 @@
   )
 
 
-;(cont-frac (lambda (i) 1.0)
+;(cont-frac (lambda (i) 2.0)
            ;(lambda (i) 1.0)
            ;13)

@@ -1,8 +1,11 @@
+;find fixed point of function by repeatedly applying guess to function
 (define (fixed-point f first-guess)
-  (display "4")
-  (define (close-enough? v1 v2)
-    (< (abs (- v1 v2)) 
+  (define tolerance 0.000001)
+
+  (define (close-enough? a b)
+    (< (abs (- a b)) 
        tolerance))
+
   (define (try guess)
     (let ((next (f guess)))
       (if (close-enough? guess next)
@@ -10,86 +13,60 @@
           (try next))))
   (try first-guess))
 
-(define tolerance 0.000001)
+;returns function that applies f repeatedly to x n times
+(define (repeated f n)
+  (if (= n 1) f
+    (lambda (x) (f ((repeated f (- n 1)) x)))))
+  
+;formula for calculating number of times average-damp function should be
+;applied 
+(define (get-max-pow n) 
+  (define (iter p r) 
+    (if (< (- n r) 0) 
+      (- p 1) 
+      (iter (+ p 1) (* r 2)))) 
 
-(define (close-enough? x y) 
-  (< (abs (- x y)) 0.001))
+  (iter 1 2)) 
+
+;b^p
+(define (pow b p)
+  (define (pow-iter base total power)
+    (cond ((= power 0) total)
+          (else (pow-iter base (* total base) (- power 1)))
+          ))
+  (pow-iter b 1 p))
 
 (define (average x y)
-  (/ (+ x y) 2))
+  (/ (+ x y) 2.0))
 
+;returns function that takes input y and finds average of y and f(y)
+(define (average-damp f)
+   (lambda (y) (average y (f y))))
+
+
+;(repeated average-damp (get-max-pow n)) --> return fun that applies
+;average-damp (get-max-pow n) times to an argument (in this case, that argument is
+;the lambda x / y^(n - 1))
+
+;nb: average-damp takes a function as argument, therefore so does a repeated
+;average-damp
+
+ (define (nth-root n x) 
+   (fixed-point ((repeated average-damp (get-max-pow n)) 
+                 (lambda (y) (/ x (pow y (- n 1))))) 
+                1.0)) 
+
+;nth-root can be seen to simplify to sqrt function when n = 2
 (define (sqrt x)
   (fixed-point 
    (lambda (y) (average y (/ x y)))
    1.0))
-
+   
+;nth-root can be seen to simplify to cube-root function when n = 3
 (define (cube-root x)
   (fixed-point 
    (lambda (y) (average y (/ x (* y y))))
    1.0))
 
-(define (repeated f n)
-  (display "3") 
-(define (repeated-iter fm m)
-  (display "5") 
-  (if (= m 1) fm
-    (repeated-iter (compose f fm) (- m 1))
-    ))
-(display "6") 
-  (lambda (x)
-    ((repeated-iter f n) x)
-  ))
-
-(define (compose f g)
-  (lambda (x) 
-    (f ( g x))
-    ))
-
-(define (fourth-root x)
-    (define (average-damp y)
-        (average y (/ x (* y y y))))
-
-  (fixed-point 
-  (repeated average-damp 2)
-   1.0))
-
-  
-(define (fifth-root x)
-    (define (average-damp y)
-        (average y (/ x (* y y y y))))
-
-  (fixed-point 
-  (repeated average-damp 2)
-   1.0))
-
- (define (get-max-pow n) 
-   (define (iter p r) 
-     (if (< (- n r) 0) 
-       (- p 1) 
-       (iter (+ p 1) (* r 2)))) 
-
-   (iter 1 2)) 
-
-(define (pow b p)
-  (define (pow-iter b total p)
-    (cond ((= p 0) 1)
-          ((= p 1) b)
-          (else (pow-iter b (* total p) (- p 1)))
-          )))
-
-(define (nth-root x n)
-  (display "1")
-    (define (average-damp y)
-        (average y (/ x (pow y (- n 1)))))
-
- (display "2")
-  (fixed-point 
-  (repeated average-damp (get-max-pow n))
-   1.0))
-
-;(cube-root 27)
-;(fourth-root 81)
-(nth-root 32 5)
-;(get-max-pow 5)
-
-
+;example
+(nth-root 5 32)

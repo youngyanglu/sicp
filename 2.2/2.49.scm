@@ -1,0 +1,31 @@
+(define (segments->painter segment-list)
+  (lambda (frame)
+    (for-each
+     (lambda (segment)
+       (draw-line
+        ((frame-coord-map frame) 
+         (start-segment segment))
+        ((frame-coord-map frame) 
+         (end-segment segment))))
+     segment-list)))
+
+(define (make-vect x y) (cons x y))
+(define (xcor-vect v) (car v))
+(define (ycor-vect v) (cdr v))
+
+(define (make-segment v1 v2) (cons v1 v2))
+(define (start-segment s) (car s))
+(define (end-segment s) (cdr s))
+
+(define (outline-painter) (segments->painter) 
+     (let ((p1 (make-vect .5 0))
+        (p2 (make-vect .5 1))
+        (p3 (make-vect 0 .5))
+        (p4 (make-vect 1 .5))
+        (s1 (make-segment p1 p2))
+        (s2 (make-segment p2 p3))
+        (s3 (make-segment p3 p4))
+        (s4 (make-segment p4 p1))
+        )
+        (segments->painter (list s1 s2 s3 s3))
+))

@@ -22,3 +22,5 @@
 
 ;(define one-half (make-rat -1 2))
 ;(print-rat one-half)
+
+(print "jello")

@@ -7,6 +7,6 @@
 (define (cdr z) 
   (z (lambda (p q) q)))
 
-(define x(cons 1 2))
-;(display (car x))
-;(display (cdr x))
+(define x (cons 1 2))
+(display (car x))
+(display (cadr x))
